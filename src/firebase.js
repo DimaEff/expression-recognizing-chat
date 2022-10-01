@@ -1,10 +1,19 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getFirestore } from 'firebase/firestore/lite';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import {initializeApp} from "firebase/app";
+import {
+    getFirestore,
+    onSnapshot,
+    orderBy,
+    query,
+    addDoc,
+    collection,
+    serverTimestamp,
+    setDoc,
+    doc,
+} from 'firebase/firestore';
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
-// Your web app's Firebase configuration
+import {COLLECTIONS_NAMES, EMOTIONS} from "./consts";
+
 const firebaseConfig = {
     apiKey: "AIzaSyCayePJYTxkL3Eqp2qCVb1aSTu1YctH8IY",
     authDomain: "expression-detection-chat.firebaseapp.com",
@@ -15,4 +24,45 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+export const authUser = async () => {
+    const res = await signInWithPopup(auth, provider);
+    // should not await; reset the state of the user
+    addUser(res.user.uid);
+    return res.user;
+}
+const addUser = async (uid) => {
+    return setDoc(doc(db, COLLECTIONS_NAMES.USERS, uid), {
+        emotion: EMOTIONS.HAPPY,
+    });
+};
+
+export const signOut = async () => {
+    await auth.signOut();
+}
+
+export const addMessage = async (uid, text, emotion) => {
+    return addDoc(collection(db, COLLECTIONS_NAMES.MESSAGES), {
+        uid: "123",
+        text,
+        emotion,
+        timestamp: serverTimestamp(),
+    });
+};
+
+export const subscribeMessages = async (callback) => {
+    return onSnapshot(
+        query(
+            collection(db, COLLECTIONS_NAMES.MESSAGES),
+            orderBy('timestamp', 'asc')
+        ),
+        (querySnapshot) => {
+            console.log("123");
+            const messages = querySnapshot.docs.map((doc) => doc.data());
+            callback(messages);
+        }
+    );
+};
