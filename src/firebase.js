@@ -9,6 +9,8 @@ import {
     serverTimestamp,
     setDoc,
     doc,
+    getDocs,
+    updateDoc,
 } from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
@@ -66,3 +68,20 @@ export const subscribeMessages = async (callback) => {
         }
     );
 };
+
+export const subscribeInterlocutorEmotion = async (interlocutorUid) => {
+    return onSnapshot(doc(db, COLLECTIONS_NAMES.USERS, interlocutorUid), (doc) => {
+        console.log(doc.data());
+    });
+}
+
+export const updateCurrentUserEmotion = async (currentUser, emotion) => {
+    updateDoc(doc(db, COLLECTIONS_NAMES.USERS, currentUser), {emotion});
+}
+
+export const getInterlocutorId = async (currentUid) => {
+    const querySnapshot = await getDocs(collection(db, COLLECTIONS_NAMES.USERS));
+    return querySnapshot.docs.find((doc) => doc.id !== currentUid).id;
+}
+
+

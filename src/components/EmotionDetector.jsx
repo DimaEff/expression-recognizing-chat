@@ -1,16 +1,20 @@
-import {useRef, useEffect, useState} from 'react';
+import {useRef, useEffect, useState, useContext} from 'react';
 import * as faceapi from "face-api.js";
+import {updateCurrentUserEmotion} from "../firebase";
+import {AuthContext} from "../App";
 
 function App() {
+    const {user} = useContext(AuthContext);
+
     const [emotion, setEmotion] = useState("");
     // set emotion to the database if emotion dont change during delay
     useEffect(() => {
         if (!!emotion) {
             console.log("before debounce", emotion);
-            const t = setTimeout(() => console.log(emotion), 1500);
+            const t = setTimeout(() => updateCurrentUserEmotion(user.uid, emotion), 1500);
             return () => clearTimeout(t);
         }
-    }, [emotion]);
+    }, [emotion, user]);
 
     const videoRef = useRef();
 

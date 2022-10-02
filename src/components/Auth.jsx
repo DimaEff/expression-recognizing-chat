@@ -1,9 +1,10 @@
-import React, {useContext} from 'react';
-import {AuthContext} from "../App";
-import {authUser, signOut} from "../firebase";
+import React, {useContext, useEffect} from 'react';
+import {AuthContext, InterlocutorContext} from "../App";
+import {authUser, getInterlocutorId, signOut} from "../firebase";
 
 const Auth = () => {
     const {user, setUser} = useContext(AuthContext);
+    const {setInterlocutorUid} = useContext(InterlocutorContext);
 
     const handleSignOut = async () => {
         // should not wait
@@ -15,6 +16,16 @@ const Auth = () => {
         const u = await authUser();
         setUser(u);
     }
+
+    useEffect(() => {
+        const fetchInterlocutorId = async () => {
+            if (user) {
+                const iId = await getInterlocutorId(user.uid);
+                setInterlocutorUid(iId);
+            }
+        };
+        fetchInterlocutorId();
+    }, [user]);
 
     return (
         <div>

@@ -1,11 +1,18 @@
 import React, {useState, useEffect, useContext} from 'react';
 import Message from "./Message";
-import {addMessage, subscribeMessages} from "../firebase";
+import {addMessage, subscribeInterlocutorEmotion, subscribeMessages} from "../firebase";
 import {EMOTIONS} from "../consts";
-import {AuthContext} from "../App";
+import {AuthContext, InterlocutorContext} from "../App";
 
 const Chat = () => {
     const {user} = useContext(AuthContext);
+    const {interlocutorUid} = useContext(InterlocutorContext);
+
+    useEffect(() => {
+        if (interlocutorUid) {
+            return subscribeInterlocutorEmotion(interlocutorUid);
+        }
+    }, [interlocutorUid]);
 
     const [messages, setMessages] = useState([]);
     useEffect(() => {
