@@ -58,7 +58,7 @@ function App() {
     return (
         <div className="app">
             <Box sx={emojiStyles}>
-                {EMOTIONS_INFO[emotion].emogi}
+                {EMOTIONS_INFO[emotion]?.emogi}
             </Box>
             <div className='app__video'>
                 <video style={{display: "none"}} crossOrigin='anonymous' ref={videoRef} autoPlay></video>
