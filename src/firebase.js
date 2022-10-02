@@ -11,6 +11,7 @@ import {
     doc,
     getDocs,
     updateDoc,
+    getDoc,
 } from 'firebase/firestore';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
@@ -46,9 +47,10 @@ export const signOut = async () => {
     await auth.signOut();
 }
 
-export const addMessage = async (uid, text, emotion) => {
+export const addMessage = async (uid, text) => {
+    const emotion = await getUserEmotion(uid);
     return addDoc(collection(db, COLLECTIONS_NAMES.MESSAGES), {
-        uid: "123",
+        uid,
         text,
         emotion,
         timestamp: serverTimestamp(),
@@ -69,19 +71,31 @@ export const subscribeMessages = async (callback) => {
     );
 };
 
-export const subscribeInterlocutorEmotion = async (interlocutorUid) => {
+export const subscribeInterlocutorEmotion = async (interlocutorUid, callback) => {
     return onSnapshot(doc(db, COLLECTIONS_NAMES.USERS, interlocutorUid), (doc) => {
-        console.log(doc.data());
+        console.log("InterlocutorEmotion", doc.data().emotion);
+        callback(doc.data());
     });
 }
 
 export const updateCurrentUserEmotion = async (currentUser, emotion) => {
+    console.log("updateCurrentUserEmotion");
     updateDoc(doc(db, COLLECTIONS_NAMES.USERS, currentUser), {emotion});
 }
 
 export const getInterlocutorId = async (currentUid) => {
     const querySnapshot = await getDocs(collection(db, COLLECTIONS_NAMES.USERS));
     return querySnapshot.docs.find((doc) => doc.id !== currentUid).id;
+}
+
+export const getUserEmotion = async (uid) => {
+    const docRef = await getDoc(doc(db, COLLECTIONS_NAMES.USERS, uid));
+
+    if (docRef.exists()) {
+        return docRef.data().emotion;
+    }
+
+    return "";
 }
 
 

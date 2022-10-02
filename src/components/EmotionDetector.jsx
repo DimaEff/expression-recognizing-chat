@@ -2,6 +2,8 @@ import {useRef, useEffect, useState, useContext} from 'react';
 import * as faceapi from "face-api.js";
 import {updateCurrentUserEmotion} from "../firebase";
 import {AuthContext} from "../App";
+import {Box} from "@mui/material";
+import {EMOTIONS_INFO} from "../consts";
 
 function App() {
     const {user} = useContext(AuthContext);
@@ -55,13 +57,21 @@ function App() {
 
     return (
         <div className="app">
-            {emotion}
-            <h1> AI FACE DETECTION</h1>
+            <Box sx={emojiStyles}>
+                {EMOTIONS_INFO[emotion].emogi}
+            </Box>
             <div className='app__video'>
                 <video style={{display: "none"}} crossOrigin='anonymous' ref={videoRef} autoPlay></video>
             </div>
         </div>
     );
 }
+
+const emojiStyles = {
+    position: "absolute",
+    top: 4,
+    left: 4,
+    fontSize: 30,
+};
 
 export default App;
