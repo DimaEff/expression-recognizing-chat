@@ -23,7 +23,7 @@ const Chat = () => {
         if (user?.uid) {
             subscribeMessages(setMessages);
         }
-    }, [user?.uid])
+    }, [user?.uid]);
 
     return (
         <Paper
